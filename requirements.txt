@@ -1,0 +1,4 @@
+--index-url https://pypi.python.org/simple/
+numpy>=1.0
+seaborn>=0.7
+matplotlib>=2.0
