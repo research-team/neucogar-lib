@@ -1,4 +1,4 @@
-from neucogar.api_kernel import Nucleus
+from neucogar.Nucleus import Nucleus
 from neucogar.api_kernel import CreateNetwork
 
 from neucogar.namespaces import *

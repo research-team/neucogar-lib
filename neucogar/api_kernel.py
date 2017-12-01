@@ -191,6 +191,7 @@ def Simulate(time):
 	startsimulate = datetime.datetime.now()
 	__logger.info("Total number of connections {:,}".format(NEST.GetKernelStatus()['num_connections']))
 	# Simulation
+
 	NEST.Simulate(float(time))
 
 	#

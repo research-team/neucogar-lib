@@ -9,7 +9,7 @@ api.SetKernelStatus(local_num_threads=4,
 # Import connectomes
 from connectomes import *
 
-api.Simulate(100.)
+api.Simulate(1000.)
 
 diagrams.BuildSpikeDiagrams()
 diagrams.BuildVoltageDiagrams()

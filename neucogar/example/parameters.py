@@ -20,10 +20,10 @@ stdp_glu_params = {'delay': [1, 2.5],       # Synaptic delay
 
 stdp_gaba_params = {'delay': [1, 2.5],      # Synaptic delay
 					'alpha': 1.0,           # Coeficient for inhibitory STDP time (alpha * lambda)
-					'lambda': 0.01,         # Time interval for STDP
+					'lambda': 0.001,         # Time interval for STDP
 					'Wmax': -10.0,          # Maximum possible weight
-					'mu_minus': 0.01,       # STDP depression step
-					'mu_plus': 0.01         # STDP potential step
+					'mu_minus': 0.001,       # STDP depression step
+					'mu_plus': 0.001         # STDP potential step
 					}
 
 stdp_dopa_ex_params = {'delay': [1, 2.5],   # Synaptic delay

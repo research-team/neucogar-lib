@@ -16,6 +16,7 @@ motor_cortex.nuclei(Glu_0).connect(striatum.nuclei(GABA_D1), synapse=Glutamaterg
 motor_cortex.nuclei(Glu_0).connect(striatum.nuclei(GABA_D2), synapse=Glutamatergic, weight=0.1)
 motor_cortex.nuclei(Glu_0).connect(striatum.nuclei(GABA_D2), synapse=Glutamatergic, weight=0.08)
 motor_cortex.nuclei(Glu_0).connect(stn.nuclei(Glu), synapse=Glutamatergic, weight=1)
+motor_cortex.nuclei(Glu_0).connect(thalamus.nuclei(Glu), synapse=Glutamatergic, weight=0.08)
 
 thalamus.nuclei(Glu).connect(motor_cortex.nuclei(Glu_1), synapse=Glutamatergic, weight=1)
 
@@ -45,9 +46,8 @@ vta.nuclei(DA).ConnectPoissonGenerator(start=400., stop=600., rate=350, conn_per
 
 # Connect spikedetectors
 motor_cortex.nuclei(Glu_0).ConnectDetector()
-striatum.nuclei(GABA_D1).ConnectDetector()
-striatum.nuclei(GABA_D2).ConnectDetector()
+thalamus.nuclei(Glu).ConnectDetector()
 
 # Connect multimeters
 motor_cortex.nuclei(Glu_0).ConnectMultimeter()
-striatum.nuclei(GABA_D2).ConnectMultimeter()
+thalamus.nuclei(Glu).ConnectMultimeter()

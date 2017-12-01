@@ -40,7 +40,7 @@ class SynapseModel:
 		# Log actions
 		_logger.info("{0} synapse ({1}) {2}".format(self.__synapse_user_model,
 		                                            self.__synapse_nest_model,
-		                                           "[+vt]" if self.__volume_transmitter else ""))
+		                                            "[+vt]" if self.__volume_transmitter else ""))
 
 
 	def getModel(self):
@@ -55,6 +55,7 @@ class SynapseModel:
 			dict: dict of the NEST readable format of parameters
 		"""
 		new_params_dict = dict(self.__synapse_parameters)
+
 		for parameter, value in new_params_dict.items():
 			if type(value) is list:
 				new_params_dict[ parameter ] = {
@@ -63,12 +64,24 @@ class SynapseModel:
 				    'high': float(value[1])
 				}
 		new_params_dict['model'] = self.__synapse_user_model
+
 		return new_params_dict
 
 
 	@staticmethod
 	def _int2Float(params_dict):
+		"""
+		Convert int variables to float
+		Args:
+			params_dict: original dict of parameters
+		Returns:
+			dict
+		"""
 		for parameter, value in params_dict.items():
 			if type(value) is int:
 				params_dict[parameter] = float(value)
+			if type(value) is list:
+				if len(value) > 2:
+					raise ValueError("Can't process lists with more than 2 values")
+				params_dict[parameter] = [ float(value[0]), float(value[1]) ]
 		return params_dict

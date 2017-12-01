@@ -18,7 +18,7 @@ def __create_result_dir(results_dir):
 		os.makedirs(results_dir + "/img")
 
 
-def BuildSpikeDiagrams(results_dir=None, hist_binwidth=5.0):
+def BuildSpikeDiagrams(results_dir=None, hist_binwidth=1.0):
 	"""
 	Function for building spike diagrams
 
@@ -152,7 +152,7 @@ def BuildWeightDiagrams(results_dir=None):
 	# collect all .csv files
 	# if file is not empty take data
 	for weight_file in files_csv:
-		file_path = "{0}/{1}".format(results_dir, voltage_file)
+		file_path = "{0}/{1}".format(results_dir, weight_file)
 		if os.stat(file_path).st_size > 0:
 			with open("{0}/{1}".format(results_dir, weight_file), 'r') as file:
 				for line in file:
@@ -169,30 +169,6 @@ def BuildWeightDiagrams(results_dir=None):
 		logger.info("{0}... ".format(weight_file))
 
 
-def __make_weight_diagram(conn_dict, txt_path):
-	"""
-	Args:
-		conn_dict (dict):
-		txt_path (str):
-	"""
-
-	fig = pylab.figure()
-	fig.suptitle("STDP")
-	pylab.xlabel("Time (ms)")
-	pylab.ylabel("Weight")
-
-	for conn in list(conn_dict)[:10]:
-		times = [data[0] for data in conn_dict[conn]]
-		weights = [data[1] for data in conn_dict[conn]]
-		pylab.plot(times, weights, label="{}".format(conn))
-		pylab.draw()
-
-	pylab.legend(loc='upper left')
-	pylab.savefig("{0}/img/{1}.png".format(txt_path, "STDP_weights"), figsize=(10, 6), dpi=120, format='png')
-	pylab.close()
-
-
-
 def __make_spikes_diagram(times, gids, file_name, results_dir, hist_binwidth):
 	"""
 	Draw spike diagram
@@ -205,14 +181,13 @@ def __make_spikes_diagram(times, gids, file_name, results_dir, hist_binwidth):
 		hist_binwidth (float): width of one bin in milliseconds
 	"""
 	bar_color = 'green'         # bar color
-	border_color = '#0f1c16'    # border color
+	border_color = 'b'    # border color
 	simulation_time = api.NEST.GetKernelStatus()['time']
 	title = file_name.split(".")[0]
 
 	# create big-expensive-figure
 	pylab.ioff()  # turn updates off
 	pylab.figure()
-	time.sleep(1.5)
 	location = pylab.axes([0.1, 0.3, 0.85, 0.6])
 	# Plotting spikes dots
 	pylab.plot(times, gids, '.')
@@ -240,7 +215,7 @@ def __make_spikes_diagram(times, gids, file_name, results_dir, hist_binwidth):
 	# Recalculate heights of bins to show rate in Hz of spiking
 	heights = (1000 * n / (hist_binwidth * num_neurons))
 	# Draw the bar
-	pylab.bar(bins[:-1], heights, width=hist_binwidth, color=bar_color, edgecolor=border_color)
+	pylab.bar(bins[:-1], heights, width=hist_binwidth, color=bar_color)
 	yticks = numpy.linspace(start=0, stop=max(heights), num=5)
 	pylab.yticks([int(a) for a in yticks])
 	pylab.ylabel("Rate (Hz)")
@@ -251,33 +226,64 @@ def __make_spikes_diagram(times, gids, file_name, results_dir, hist_binwidth):
 	pylab.xlim([0, simulation_time])
 	pylab.draw()
 	pylab.savefig("{0}/img/spikes_{1}.png".format(results_dir, title), dpi=120, format='png')
+	pylab.close()
 	return 'OK'
 
-def __make_voltage_diagram(times, voltages, name, path):
+def __make_voltage_diagram(times, voltages, file_name, path):
 	"""
 	Draw voltage diagram
 
 	Args:
 		times (dict): time data of neuron (if list) and neurons (if dict)
 		voltages (dict): voltage data of neuron (if list) and neurons (if dict)
-		name (str): name of brain part
+		file_name (str): name of brain part
 		path (str): path to save results
 	"""
 	title = file_name.split(".")[0]
 
 	pylab.ioff()  # turn updates off
 	pylab.figure()
-	time.sleep(1.5)
 	for key in times:
 		pylab.plot(times[key], voltages[key], "", label=key)
 	pylab.ylabel("Membrane potential (mV)")
 	pylab.xlabel("Time (ms)")
 	pylab.legend(loc="best")
-	pylab.title(name)
+	pylab.title(title)
 	pylab.grid(True)
 	pylab.draw()
-	pylab.savefig("{0}/img/voltage_{1}.png".format(path, name), dpi=120, format='png')
+	pylab.savefig("{0}/img/voltage_{1}.png".format(path, title), dpi=120, format='png')
+	pylab.close()
 	return 'OK'
+
+
+def __make_weight_diagram(conn_dict, txt_path):
+	"""
+	Args:
+		conn_dict (dict):
+		txt_path (str):
+	"""
+
+	fig = pylab.figure()
+	fig.suptitle("STDP")
+	pylab.xlabel("Time (ms)")
+	pylab.ylabel("Weight")
+	min_weight = 999
+	max_weight = -999
+	for conn in list(conn_dict.keys())[:10]:
+		times = [float(data[0]) for data in conn_dict[conn]]
+		weights = [float(data[1]) for data in conn_dict[conn]]
+		if min(weights) < min_weight:
+			min_weight = min(weights)
+		if max(weights) > max_weight:
+			max_weight = max(weights)
+		pylab.plot(times, weights, label="{}".format(conn))
+		pylab.draw()
+	yticks = numpy.linspace(start=min_weight, stop=max_weight, num=10)
+	pylab.yticks([float(a) for a in yticks])
+	pylab.legend(loc='upper left')
+	pylab.savefig("{0}/img/{1}.png".format(txt_path, "STDP_weights"), figsize=(10, 6), dpi=120, format='png')
+	pylab.close()
+
 
 # As independent script
 if __name__ == '__main__':
