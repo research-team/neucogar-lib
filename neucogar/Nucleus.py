@@ -343,6 +343,49 @@ class Nucleus:
 			syn_mem_usage
 		))
 
+	def ConnectGenerator(self, generator, syn_spec, conn_spec):
+		"""
+		Poisson_generator - simulate neuron firing with Poisson processes statistics.
+
+		The poisson_generator simulates a neuron that is firing with Poisson statistics, i.e. exponentially
+		distributed interspike intervals. It will generate a _unique_ spike train for each of it's targets.
+		If you do not want this behavior and need the same spike train for all targets, you have to use a
+		parrot neuron inbetween the poisson generator and the targets.
+
+		Args:
+			generator (float): Synaptic weight of generator (nS)
+			start (int or float): Start generator at this time (ms)
+			stop (int or float): Stop generator at this time (ms)
+			conn_percent (int or float or None): Probability of connections. How much neurons will be connected to the generator
+		"""
+		# Set standard start time if it is not specified
+
+
+		api_kernel.NEST.Connect(generator,
+		                        self.getNeurons(),
+		                        conn_spec=conn_spec,
+		                        syn_spec=syn_spec)
+		# Get memory usage of connections
+		syn_mem_usage = self._usage_memory(created_synapses, "static_synapse")
+		# Update global sum
+		api_kernel.syn_mem_usage += syn_mem_usage
+		# Update global sum of synapses
+		api_kernel.global_syn_number += created_synapses
+		# Get memory usage of device
+		dev_mem_usage = self._usage_memory(1, generator)
+		# Update global sum
+		api_kernel.dev_mem_usage += dev_mem_usage
+		# Log actions
+		logger.info("(ID:{0}) to {1} (connected {2}%). Interval: {3}-{4} ms. Dev: {5} MB. Syn: {6} MB".format(
+			generator[0],
+			self.getName(),
+			conn_percent,
+			start,
+			stop,
+			dev_mem_usage,
+			syn_mem_usage
+		))
+
 
 	def ConnectDetector(self):
 		"""
