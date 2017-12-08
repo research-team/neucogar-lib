@@ -345,26 +345,22 @@ class Nucleus:
 
 	def ConnectGenerator(self, generator, syn_spec, conn_spec):
 		"""
-		Poisson_generator - simulate neuron firing with Poisson processes statistics.
-
-		The poisson_generator simulates a neuron that is firing with Poisson statistics, i.e. exponentially
-		distributed interspike intervals. It will generate a _unique_ spike train for each of it's targets.
-		If you do not want this behavior and need the same spike train for all targets, you have to use a
-		parrot neuron inbetween the poisson generator and the targets.
-
 		Args:
-			generator (float): Synaptic weight of generator (nS)
-			start (int or float): Start generator at this time (ms)
-			stop (int or float): Stop generator at this time (ms)
-			conn_percent (int or float or None): Probability of connections. How much neurons will be connected to the generator
+			generator:
+			syn_spec (dict):
+			conn_spec (dict):
 		"""
-		# Set standard start time if it is not specified
-
-
 		api_kernel.NEST.Connect(generator,
 		                        self.getNeurons(),
 		                        conn_spec=conn_spec,
 		                        syn_spec=syn_spec)
+		connections = api_kernel.NEST.GetConnections(generator, self.getNeurons(), synapse_model=syn_spec["model"])
+		connections_statuses = api_kernel.NEST.GetStatus(connections)
+		created_synapses = len(connections_statuses)
+		connection_target_ids = []
+		for connection in connections_statuses:
+			connection_target_ids.append(connection["target"])
+		connection_percent = int(100 * len(set(connection_target_ids))/self.getNeuronNumber())
 		# Get memory usage of connections
 		syn_mem_usage = self._usage_memory(created_synapses, "static_synapse")
 		# Update global sum
@@ -376,12 +372,13 @@ class Nucleus:
 		# Update global sum
 		api_kernel.dev_mem_usage += dev_mem_usage
 		# Log actions
+		generator_status = api_kernel.NEST.GetStatus(generator)[0]
 		logger.info("(ID:{0}) to {1} (connected {2}%). Interval: {3}-{4} ms. Dev: {5} MB. Syn: {6} MB".format(
 			generator[0],
 			self.getName(),
-			conn_percent,
-			start,
-			stop,
+			connection_percent,
+			generator_status["start"],
+			generator_status["stop"],
 			dev_mem_usage,
 			syn_mem_usage
 		))
