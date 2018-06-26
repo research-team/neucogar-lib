@@ -42,5 +42,4 @@ class MotorCortexColumns(AbstractColumns):
 		# Setup synapse model
 		for column_index in self.getColumnsIndexes():
 			for neighbor_index in self._getColumnNeighbors(column_index):
-				self.columns(column_index).layers(L2).nuclei(Glu).connect(
-					self.columns(neighbor_index).layers(L2).nuclei(Glu), synapse=self._Glutamatergic, weight=0.5, conn_prob=0.093)
+				self.columns(column_index).layers(L2).nuclei(Glu).connect(self.columns(neighbor_index).layers(L2).nuclei(Glu), synapse=self._Glutamatergic, weight=0.5, conn_prob=0.093)

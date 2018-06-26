@@ -78,7 +78,6 @@ class Nucleus:
 		Returns:
 			Nucleus (Nucleus): object of nucleus
 		"""
-
 		if type(nucleus) is Nucleus:
 			nucleus_name = nucleus.getName()
 			if nucleus_name not in self._nuclei.keys():
@@ -91,7 +90,8 @@ class Nucleus:
 
 	def _reduceNeuronNumber(self, coeficient):
 		self._scale_nrn_number = coeficient * 100
-		self._neuron_number = int(self._neuron_number * coeficient)
+		nrn_number = int(self._neuron_number * coeficient)
+		self._neuron_number = 10 if nrn_number <= 10 else nrn_number
 
 	@staticmethod
 	def _useRandomDistribution(params):
@@ -226,7 +226,7 @@ class Nucleus:
 			# Create weight recorder with parameters
 			weight_recorder = api_kernel.NEST.Create('weight_recorder',
 			                                          params=weight_recorder_params)
-			
+
 			api_kernel.NEST.Connect(self.getNeurons()[5:],
 			                        nucleus.getNeurons(),
 			                        conn_spec=conn_spec,

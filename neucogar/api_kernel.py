@@ -1,4 +1,4 @@
-__author__  = "Alexey Panzer"
+__author__ = "Alexey Panzer"
 __version__ = "2.0.3"
 __tested___ = "27.11.2017 NEST 2.12.0 Python 3"
 

@@ -152,6 +152,7 @@ def __collapse_data(dt):
 
 colorbar = None
 one = True
+
 def heatmap_builder(interval_index, width_x=5):
     """
 
@@ -213,7 +214,7 @@ if __name__ == '__main__':
 
     # Create figure
     fig = plt.figure()
-    #plt.ion()
+    # plt.ion()
 
     # Init heatmap
     init_heatmap_data(dt=delta_t)
