@@ -343,6 +343,46 @@ class Nucleus:
 			syn_mem_usage
 		))
 
+	def ConnectGenerator(self, generator, syn_spec, conn_spec):
+		"""
+		Args:
+			generator:
+			syn_spec (dict):
+			conn_spec (dict):
+		"""
+		api_kernel.NEST.Connect(generator,
+		                        self.getNeurons(),
+		                        conn_spec=conn_spec,
+		                        syn_spec=syn_spec)
+		connections = api_kernel.NEST.GetConnections(generator, self.getNeurons(), synapse_model=syn_spec["model"])
+		connections_statuses = api_kernel.NEST.GetStatus(connections)
+		created_synapses = len(connections_statuses)
+		connection_target_ids = []
+		for connection in connections_statuses:
+			connection_target_ids.append(connection["target"])
+		connection_percent = int(100 * len(set(connection_target_ids))/self.getNeuronNumber())
+		# Get memory usage of connections
+		syn_mem_usage = self._usage_memory(created_synapses, "static_synapse")
+		# Update global sum
+		api_kernel.syn_mem_usage += syn_mem_usage
+		# Update global sum of synapses
+		api_kernel.global_syn_number += created_synapses
+		# Get memory usage of device
+		dev_mem_usage = self._usage_memory(1, generator)
+		# Update global sum
+		api_kernel.dev_mem_usage += dev_mem_usage
+		# Log actions
+		generator_status = api_kernel.NEST.GetStatus(generator)[0]
+		logger.info("(ID:{0}) to {1} (connected {2}%). Interval: {3}-{4} ms. Dev: {5} MB. Syn: {6} MB".format(
+			generator[0],
+			self.getName(),
+			connection_percent,
+			generator_status["start"],
+			generator_status["stop"],
+			dev_mem_usage,
+			syn_mem_usage
+		))
+
 
 	def ConnectDetector(self):
 		"""
